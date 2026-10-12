@@ -2,15 +2,9 @@
 
 ## Enablement
 
-Apply `db/migrations/000003_events_hub.up.sql` through the existing migration workflow before enabling the feature. `event_hub_settings.enabled` defaults to false. Enable only the approved testing organisation:
+Apply `db/migrations/000003_events_hub.up.sql` through the existing migration workflow. Events is ON by default for this staging integration, as requested by the team. An authenticated organisation member's first Events capability check creates enabled settings automatically; no manual activation SQL is needed. Existing explicit disable settings remain respected.
 
-```sql
-INSERT INTO event_hub_settings (organisation_id, enabled, revision, updated_at)
-VALUES ('<testing-organisation-uuid>', true, 0, now())
-ON CONFLICT (organisation_id) DO UPDATE SET enabled = true;
-```
-
-Use existing authentication and database configuration. Default organisation roles receive event permissions; explicit denials and custom grants remain intact. Review grants before activation.
+Use existing authentication and database configuration. Default organisation roles receive event permissions; explicit denials and custom grants remain intact. The switch remains available to disable the feature through the organisation settings record.
 
 ## Behaviour
 

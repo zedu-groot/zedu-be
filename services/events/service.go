@@ -127,7 +127,14 @@ func (s *Service) access(db *gorm.DB, actor Actor) (access, error) {
 		a.permissions.CanFeatureEvents = true
 	}
 	_, err = postgresql.SelectOneFromDb(db, &a.settings, "organisation_id = ?", actor.OrganisationID)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		a.settings = models.EventHubSettings{OrganisationID: actor.OrganisationID, Enabled: true, UpdatedAt: s.clock()}
+		if _, err = postgresql.CreateIdempotentRecord(db, &a.settings); err != nil {
+			return a, err
+		}
+		_, err = postgresql.SelectOneFromDb(db, &a.settings, "organisation_id = ?", actor.OrganisationID)
+	}
+	if err != nil {
 		return a, err
 	}
 	return a, nil

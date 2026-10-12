@@ -34,7 +34,14 @@ func TestMigrationAfterAutoMigrateInstallsConstraints(t *testing.T) {
 	if count < 15 {
 		t.Fatalf("missing integrity constraints after GORM-first migration: got %d, want at least 15", count)
 	}
-	enable(t, f)
+	var enabled bool
+	if err := f.db.Exec("INSERT INTO event_hub_settings(organisation_id) VALUES (?)", f.host.OrganisationID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := f.db.Table("event_hub_settings").Select("enabled").Where("organisation_id = ?", f.host.OrganisationID).Scan(&enabled).Error; err != nil || !enabled {
+		t.Fatalf("migration default must be ON: %v %v", enabled, err)
+	}
+
 	e := published(t, f)
 	if err := f.db.Exec("UPDATE events SET status = 'invalid' WHERE id = ?", e.Event.ID).Error; err == nil {
 		t.Fatal("invalid event status accepted")

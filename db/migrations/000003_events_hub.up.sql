@@ -13,8 +13,9 @@ CREATE TABLE IF NOT EXISTS event_rsvps (
 );
 CREATE INDEX IF NOT EXISTS idx_event_rsvps_member ON event_rsvps(organisation_id,user_id,going);
 CREATE TABLE IF NOT EXISTS event_hub_settings (
- organisation_id uuid PRIMARY KEY,enabled boolean NOT NULL DEFAULT false,featured_event_id uuid,revision bigint NOT NULL DEFAULT 0,updated_at timestamptz NOT NULL DEFAULT now()
+ organisation_id uuid PRIMARY KEY,enabled boolean NOT NULL DEFAULT true,featured_event_id uuid,revision bigint NOT NULL DEFAULT 0,updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE event_hub_settings ALTER COLUMN enabled SET DEFAULT true;
 CREATE TABLE IF NOT EXISTS event_notification_outbox (
  id uuid PRIMARY KEY,event_id uuid NOT NULL,organisation_id uuid NOT NULL,user_id uuid NOT NULL,kind varchar(16) NOT NULL,
  delivery_key varchar(256) NOT NULL UNIQUE,due_at timestamptz NOT NULL,revision bigint NOT NULL,schedule_version bigint NOT NULL,state varchar(16) NOT NULL DEFAULT 'pending',

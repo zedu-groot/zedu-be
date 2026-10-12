@@ -116,18 +116,32 @@ func published(t *testing.T, f *fixture) models.EventResponse {
 	}
 	return r
 }
-func TestFeatureOffAndFreshMembershipChecks(t *testing.T) {
+func TestDefaultOnExplicitDisableAndFreshMembershipChecks(t *testing.T) {
 	f := setup(t)
-	caps, err := f.s.Capabilities(context.Background(), f.member)
-	if err != nil || caps.Enabled {
-		t.Fatalf("feature must be OFF by default: %v %v", caps, err)
+	ctx := context.Background()
+	caps, err := f.s.Capabilities(ctx, f.member)
+	if err != nil || !caps.Enabled || !caps.CanView {
+		t.Fatalf("Events must be available without activation: %v %v", caps, err)
 	}
-	enable(t, f)
-	if _, err := f.s.Capabilities(context.Background(), f.other); events.Status(err) != 403 {
+	e := published(t, f)
+	if _, err := f.s.SetFeatured(ctx, events.FeaturedInput{Actor: f.lead, EventID: &e.Event.ID, ExpectedRevision: rev(0)}); err != nil {
+		t.Fatalf("default settings must support featuring: %v", err)
+	}
+	if err := f.db.Model(&models.EventHubSettings{}).Where("organisation_id = ?", f.host.OrganisationID).Update("enabled", false).Error; err != nil {
+		t.Fatal(err)
+	}
+	caps, err = f.s.Capabilities(ctx, f.member)
+	if err != nil || caps.Enabled {
+		t.Fatalf("explicit disable ignored: %v %v", caps, err)
+	}
+	if _, err := f.s.List(ctx, events.ListInput{Actor: f.member}); events.Status(err) != 404 {
+		t.Fatalf("disabled hub still available: %v", err)
+	}
+	if _, err := f.s.Capabilities(ctx, f.other); events.Status(err) != 403 {
 		t.Fatalf("nonmember: %v", err)
 	}
 	f.db.Exec("UPDATE org_user_managements SET is_deactivated=true WHERE user_id=?", f.member.UserID)
-	if _, err := f.s.Capabilities(context.Background(), f.member); events.Status(err) != 403 {
+	if _, err := f.s.Capabilities(ctx, f.member); events.Status(err) != 403 {
 		t.Fatalf("revoked member: %v", err)
 	}
 }
