@@ -1,31 +1,27 @@
-# Events Hub: team testing handoff
-
-Branch: `feat/events-hub-backend`. Local implementation; no deployment performed.
+# Events Hub deployment guide
 
 ## Enablement
 
-Apply migration `db/migrations/000003_events_hub.up.sql` through the repository migration workflow. The feature defaults off for every organisation. After selecting an approved testing organisation, enable only that organisation:
+Apply `db/migrations/000003_events_hub.up.sql` through the existing migration workflow before enabling the feature. `event_hub_settings.enabled` defaults to false. Enable only the approved testing organisation:
 
 ```sql
-INSERT INTO event_hub_settings (organisation_id, enabled, revision)
-VALUES ('<testing-organisation-uuid>', true, 0)
+INSERT INTO event_hub_settings (organisation_id, enabled, revision, updated_at)
+VALUES ('<testing-organisation-uuid>', true, 0, now())
 ON CONFLICT (organisation_id) DO UPDATE SET enabled = true;
 ```
 
-Use the existing authenticated API and database configuration. Do not point disposable tests at a shared database. Default organisation roles receive event permissions; explicit denials and custom roles retain their grants. Review grants before enabling.
+Use existing authentication and database configuration. Default organisation roles receive event permissions; explicit denials and custom grants remain intact. Review grants before activation.
 
-## Behaviour and workaround
+## Behaviour
 
-Routes live under `/api/v1/organisations/:org_id/events`. Capabilities gate discovery. Members RSVP and resolve Join during the server-controlled window; organisers manage drafts, publication and cancellation; leads feature an event. One-off schedules use UTC storage and Africa/Lagos display. External HTTPS meeting links provide the meeting destination until advance Buzz scheduling is supported.
+Authenticated endpoints live under `/api/v1/organisations/:org_id/events`. Members discover sessions, RSVP and resolve Join inside the server-controlled time window. Organisers manage drafts, publication and cancellation; leads feature an event. One-off schedules store UTC and display Africa/Lagos time. External HTTPS meeting destinations support the first release.
 
-Reminders and update/cancellation notices persist in the existing in-app inbox. The outbox reconciler runs every 30 seconds and River retries delivery. OneSignal push delivery is not claimed. Disable the organisation setting to close access and suppress notices; keep durable rows for investigation. Destructive down migration removes event data and should only be used on disposable environments.
+Reminders and update/cancellation notices persist in the existing in-app inbox. The outbox reconciler runs every 30 seconds and River retries delivery. Browser push is outside this implementation. Disabling the organisation setting closes access and suppresses pending notices. The down migration removes event data and must not be used as an ordinary feature-disable mechanism.
 
-## Verification evidence
+## Acceptance checks
 
-Before final review fixes, 14 focused PostgreSQL Events Hub tests passed. Review found and fixed concurrent creation retry lookup, pending schedule notices lost after a text edit, and explicit false event permissions omitted during serialization. Added three regression tests; the serialization regression failed before its fix and passed afterward. After the approval setting was updated, all 17 focused PostgreSQL tests passed. The backend build, go vet ./..., and selected existing permission tests also passed. All 17 tests also passed with Go race detection enabled. Formatting and git diff whitespace checks passed.
+Use a dedicated PostgreSQL test database and set `EVENTS_TEST_DATABASE_URL`; run `go test ./tests/test_events -count=1` and `go test -race ./tests/test_events -count=1`. Database tests skip without this variable; skipped tests do not establish database correctness. Run `go build ./...`, `go vet ./...`, and the broader repository suite with dedicated service configuration.
 
-The broader repository suite was attempted with a 180-second outer limit and could not complete: existing tests lack their dedicated service configuration in this isolated checkout (including an empty database port). No live app.env was copied. These failures are not reported as passing.
+Before activation, verify deployed frontend/backend revisions, migration completion and the active notice executor. Use host, lead, member and non-member accounts in separate browsers to check publication, discovery, RSVP persistence, reminders with the browser closed, Join boundaries, rescheduling, cancellation and access revocation. Confirm permission isolation across organisations.
 
-For disposable PostgreSQL only, set `EVENTS_TEST_DATABASE_URL` and run `go test ./tests/test_events -count=1`, then `go test -race ./tests/test_events -count=1`. Without the variable, database tests skip; that is not database verification. Run `go build ./...`, `go vet ./...` and the repository suite with a proper dedicated test environment before shared deployment.
-
-Frontend uses its own feature branch and requires a maintainer-approved route allowlist update before upstream review. No protected configuration was changed. Replace descriptive branch names with approved ticket branches before submission where required.
+No deployment, push or destination-branch merge is performed by this guide.
