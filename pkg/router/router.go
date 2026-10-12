@@ -12,6 +12,7 @@ import (
 	"riverqueue.com/riverui"
 
 	"github.com/hngprojects/telex_be/internal/config"
+	eventsController "github.com/hngprojects/telex_be/pkg/controller/events"
 	"github.com/hngprojects/telex_be/pkg/middleware"
 	"github.com/hngprojects/telex_be/pkg/repository/storage"
 	"github.com/hngprojects/telex_be/utility"
@@ -64,6 +65,7 @@ func Setup(logger *utility.Logger, validator *validator.Validate, db *storage.Da
 	Group(r, ApiVersion, validator, db, logger)
 	Admin(r, ApiVersion, validator, db, logger)
 	Buzz(r, ApiVersion, validator, db, logger)
+	Events(r, eventsController.Options{DB: db, Validator: validator, Logger: logger})
 
 	Waitlist(r, ApiVersion, validator, db, logger)
 	Search(r, ApiVersion, validator, db, logger)

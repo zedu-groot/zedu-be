@@ -77,41 +77,43 @@ type UpdateOrgRoleRequest struct {
 	Description string `json:"description" validate:"required"`
 }
 
-
 type UpdateOrgPermissionsRequest struct {
-	PermissionList                      PermissionList `json:"permission_list"`
-	Permissions                         PermissionList `json:"permissions"`
-	CanManageChannels                   bool           `json:"can_manage_channels"`
-	CanManageMembers                    bool           `json:"can_manage_members"`
-	CanManageOrganization               bool           `json:"can_manage_organization"`
-	CanManageSettings                   bool           `json:"can_manage_settings"`
-	CanManageBilling                    bool           `json:"can_manage_billing"`
-	CanManageAgents                     bool           `json:"can_manage_agents"`
-	CanManageWorkflows                  bool           `json:"can_manage_workflows"`
-	CanManageIntegrations               bool           `json:"can_manage_integrations"`
-	CanManageSecurity                   bool           `json:"can_manage_security"`
-	CanManageRoles                      bool           `json:"can_manage_roles"`
-	CanViewAnalytics                     bool           `json:"can_view_analytics"`
-	CanViewBilling                      bool           `json:"can_view_billing"`
-	CanViewChannels                     bool           `json:"can_view_channels"`
-	CanEditMessages                     bool           `json:"can_edit_messages"`
-	CanDeleteMessages                   bool           `json:"can_delete_messages"`
-	CanDeleteFiles                      bool           `json:"can_delete_files"`
-	CanCreateChannels                   bool           `json:"can_create_channels"`
-	CanCreateAgents                     bool           `json:"can_create_agents"`
-	CanCreateRole                       bool           `json:"can_create_role"`
-	CanCreateWebhooks                   bool           `json:"can_create_webhooks"`
-	CanArchiveChannels                  bool           `json:"can_archive_channels"`
-	CanInviteMembers                    bool           `json:"can_invite_members"`
-	CanRemovePeople                     bool           `json:"can_remove_people"`
-	CanCommentThreads                   bool           `json:"can_comment_threads"`
-	CanChangeUserOrgRole                bool           `json:"can_change_user_org_role"`
-	CanCreateCustomRole                 bool           `json:"can_create_custom_role"`
-	CanCreateChannel                    bool           `json:"can_create_channel"`
-	CanCommentOnThreads                 bool           `json:"can_comment_on_threads"`
-	CanDeleteAnyFile                    bool           `json:"can_delete_any_file"`
-	CanRemovePeopleFromOrganization     bool           `json:"can_remove_people_from_organization"`
-	CanManageGeneralInviteLink          bool           `json:"can_manage_general_invite_link"`
+	CanViewEvents                   bool           `json:"can_view_events"`
+	CanManageEvents                 bool           `json:"can_manage_events"`
+	CanFeatureEvents                bool           `json:"can_feature_events"`
+	PermissionList                  PermissionList `json:"permission_list"`
+	Permissions                     PermissionList `json:"permissions"`
+	CanManageChannels               bool           `json:"can_manage_channels"`
+	CanManageMembers                bool           `json:"can_manage_members"`
+	CanManageOrganization           bool           `json:"can_manage_organization"`
+	CanManageSettings               bool           `json:"can_manage_settings"`
+	CanManageBilling                bool           `json:"can_manage_billing"`
+	CanManageAgents                 bool           `json:"can_manage_agents"`
+	CanManageWorkflows              bool           `json:"can_manage_workflows"`
+	CanManageIntegrations           bool           `json:"can_manage_integrations"`
+	CanManageSecurity               bool           `json:"can_manage_security"`
+	CanManageRoles                  bool           `json:"can_manage_roles"`
+	CanViewAnalytics                bool           `json:"can_view_analytics"`
+	CanViewBilling                  bool           `json:"can_view_billing"`
+	CanViewChannels                 bool           `json:"can_view_channels"`
+	CanEditMessages                 bool           `json:"can_edit_messages"`
+	CanDeleteMessages               bool           `json:"can_delete_messages"`
+	CanDeleteFiles                  bool           `json:"can_delete_files"`
+	CanCreateChannels               bool           `json:"can_create_channels"`
+	CanCreateAgents                 bool           `json:"can_create_agents"`
+	CanCreateRole                   bool           `json:"can_create_role"`
+	CanCreateWebhooks               bool           `json:"can_create_webhooks"`
+	CanArchiveChannels              bool           `json:"can_archive_channels"`
+	CanInviteMembers                bool           `json:"can_invite_members"`
+	CanRemovePeople                 bool           `json:"can_remove_people"`
+	CanCommentThreads               bool           `json:"can_comment_threads"`
+	CanChangeUserOrgRole            bool           `json:"can_change_user_org_role"`
+	CanCreateCustomRole             bool           `json:"can_create_custom_role"`
+	CanCreateChannel                bool           `json:"can_create_channel"`
+	CanCommentOnThreads             bool           `json:"can_comment_on_threads"`
+	CanDeleteAnyFile                bool           `json:"can_delete_any_file"`
+	CanRemovePeopleFromOrganization bool           `json:"can_remove_people_from_organization"`
+	CanManageGeneralInviteLink      bool           `json:"can_manage_general_invite_link"`
 }
 
 func (req *UpdateOrgPermissionsRequest) GetPermissionList() PermissionList {
@@ -122,6 +124,7 @@ func (req *UpdateOrgPermissionsRequest) GetPermissionList() PermissionList {
 		return req.Permissions
 	}
 	return PermissionList{
+		CanViewEvents: req.CanViewEvents, CanManageEvents: req.CanManageEvents, CanFeatureEvents: req.CanFeatureEvents,
 		CanManageChannels:               req.CanManageChannels,
 		CanManageMembers:                req.CanManageMembers,
 		CanManageOrganization:           req.CanManageOrganization,

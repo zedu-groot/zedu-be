@@ -9,6 +9,7 @@ import (
 
 func RegisterWorkers(logger *utility.Logger, db *storage.Database) *river.Workers {
 	workers := river.NewWorkers()
+	river.AddWorker(workers, &EventsNoticeWorker{db: db.Postgresql, logger: logger})
 
 	river.AddWorker(workers, &AgentJobWorker{Logger: logger})
 	river.AddWorker(workers, &SavedMessagesRemainderWorker{logger: logger, db: db.Postgresql})

@@ -8,8 +8,8 @@ import (
 
 func TestMasterSystemPermissions(t *testing.T) {
 	permissions := models.GetMasterSystemPermissions()
-	if len(permissions) != 25 {
-		t.Fatalf("expected 25 master permissions, got %d", len(permissions))
+	if len(permissions) != 28 {
+		t.Fatalf("expected 28 master permissions, got %d", len(permissions))
 	}
 
 	foundManageChannels := false
@@ -63,4 +63,3 @@ func TestGetUserDefaultPermissions(t *testing.T) {
 		t.Errorf("expected CanInviteMembers to be false for default user permissions, got true")
 	}
 }
-

@@ -171,6 +171,16 @@ func seedPermissionsForRole(logger *utility.Logger, db *gorm.DB, role models.Org
 		}
 	}
 
+	switch role.Name {
+	case models.OrgRoleNameOwner, models.OrgRoleNameAdministrator, models.OrgRoleNameProjectLead:
+		permission.PermissionList.CanViewEvents = true
+		permission.PermissionList.CanManageEvents = true
+		permission.PermissionList.CanFeatureEvents = true
+	case models.OrgRoleNameManager:
+		permission.PermissionList.CanViewEvents = true
+		permission.PermissionList.CanManageEvents = true
+	}
+
 	if err := db.Create(&permission).Error; err != nil {
 		logger.Error(fmt.Sprintf("Failed to seed permission for role %s: %v", role.Name, err))
 	}

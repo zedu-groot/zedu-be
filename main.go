@@ -88,6 +88,7 @@ func main() {
 	utility.RegisterCustomValidations(validatorRef)
 
 	cronjobs.StartCronJob(request.ExternalRequest{Logger: logger}, *storage.DB, "send-notifications")
+	cronjobs.StartCronJob(request.ExternalRequest{Logger: logger}, *storage.DB, "events-outbox")
 	cronjobs.StartCronJob(request.ExternalRequest{Logger: logger}, *storage.DB, "check-buzz-warnings")
 	cronjobs.StartCronJob(request.ExternalRequest{Logger: logger}, *storage.DB, "end-expired-buzzes")
 	dispatcher := np.NewDispatcher(10, 15, db, logger)

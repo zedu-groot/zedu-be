@@ -11,6 +11,9 @@ import (
 
 // Permission name constants for use with PermissionMiddleware and userCanOrOwner.
 const (
+	PermViewEvents                   = "can_view_events"
+	PermManageEvents                 = "can_manage_events"
+	PermFeatureEvents                = "can_feature_events"
 	PermManageChannels               = "can_manage_channels"
 	PermManageMembers                = "can_manage_members"
 	PermManageOrganization           = "can_manage_organization"
@@ -55,6 +58,9 @@ type Permission struct {
 }
 
 type PermissionList struct {
+	CanViewEvents         bool `json:"can_view_events"`
+	CanManageEvents       bool `json:"can_manage_events"`
+	CanFeatureEvents      bool `json:"can_feature_events"`
 	CanManageChannels     bool `json:"can_manage_channels,omitempty"`
 	CanManageMembers      bool `json:"can_manage_members,omitempty"`
 	CanManageOrganization bool `json:"can_manage_organization,omitempty"`
@@ -99,6 +105,9 @@ type SystemPermissionInfo struct {
 
 func GetMasterSystemPermissions() []SystemPermissionInfo {
 	return []SystemPermissionInfo{
+		{Key: PermViewEvents, Name: "View Events", Category: "events", Description: "Discover and RSVP to organisation events"},
+		{Key: PermManageEvents, Name: "Manage Events", Category: "events", Description: "Draft, publish, edit and cancel events"},
+		{Key: PermFeatureEvents, Name: "Feature Events", Category: "events", Description: "Select the featured organisation event"},
 		{Key: PermManageChannels, Name: "Manage Channels", Category: "channels", Description: "Full management over channels"},
 		{Key: PermManageMembers, Name: "Manage Members", Category: "members", Description: "Manage organisation members"},
 		{Key: PermManageOrganization, Name: "Manage Organisation", Category: "organization", Description: "Manage organisation settings & profile"},
@@ -128,7 +137,7 @@ func GetMasterSystemPermissions() []SystemPermissionInfo {
 }
 
 func GetUserDefaultPermissions() PermissionList {
-	return PermissionList{
+	return PermissionList{CanViewEvents: true,
 		CanViewChannels:   true,
 		CanEditMessages:   true,
 		CanCommentThreads: true,
@@ -136,7 +145,7 @@ func GetUserDefaultPermissions() PermissionList {
 }
 
 func GetOwnerDefaultPermissions() PermissionList {
-	return PermissionList{
+	return PermissionList{CanViewEvents: true, CanManageEvents: true, CanFeatureEvents: true,
 		CanManageChannels:     true,
 		CanManageMembers:      true,
 		CanManageOrganization: true,
@@ -193,35 +202,36 @@ func (p PermissionList) ToMap() map[string]bool {
 	changeUserRole := p.CanChangeUserOrgRole
 
 	return map[string]bool{
-		"can_manage_channels":                manageChannels,
-		"can_manage_members":                 manageMembers,
-		"can_manage_organization":            manageOrg,
-		"can_manage_settings":                manageSettings,
-		"can_manage_billing":                 manageBilling,
-		"can_manage_agents":                  manageAgents,
-		"can_manage_workflows":               manageWorkflows,
-		"can_manage_integrations":            manageIntegrations,
-		"can_manage_security":                manageSecurity,
-		"can_manage_roles":                   manageRoles,
-		"can_view_analytics":                 viewAnalytics,
-		"can_view_billing":                   viewBilling,
-		"can_view_channels":                  viewChannels,
-		"can_edit_messages":                  editMessages,
-		"can_delete_messages":                deleteMessages,
-		"can_delete_files":                   deleteFiles,
-		"can_create_channels":                createChannels,
-		"can_create_agents":                  createAgents,
-		"can_create_role":                    createRole,
-		"can_create_webhooks":                createWebhooks,
-		"can_archive_channels":               archiveChannels,
-		"can_invite_members":                 inviteMembers,
-		"can_remove_people":                  removePeople,
-		"can_comment_threads":                commentThreads,
-		"can_change_user_org_role":           changeUserRole,
-		"can_create_custom_role":             createRole,
-		"can_create_channel":                 createChannels,
-		"can_comment_on_threads":             commentThreads,
-		"can_delete_any_file":                deleteFiles,
+		PermViewEvents: p.CanViewEvents, PermManageEvents: p.CanManageEvents, PermFeatureEvents: p.CanFeatureEvents,
+		"can_manage_channels":                 manageChannels,
+		"can_manage_members":                  manageMembers,
+		"can_manage_organization":             manageOrg,
+		"can_manage_settings":                 manageSettings,
+		"can_manage_billing":                  manageBilling,
+		"can_manage_agents":                   manageAgents,
+		"can_manage_workflows":                manageWorkflows,
+		"can_manage_integrations":             manageIntegrations,
+		"can_manage_security":                 manageSecurity,
+		"can_manage_roles":                    manageRoles,
+		"can_view_analytics":                  viewAnalytics,
+		"can_view_billing":                    viewBilling,
+		"can_view_channels":                   viewChannels,
+		"can_edit_messages":                   editMessages,
+		"can_delete_messages":                 deleteMessages,
+		"can_delete_files":                    deleteFiles,
+		"can_create_channels":                 createChannels,
+		"can_create_agents":                   createAgents,
+		"can_create_role":                     createRole,
+		"can_create_webhooks":                 createWebhooks,
+		"can_archive_channels":                archiveChannels,
+		"can_invite_members":                  inviteMembers,
+		"can_remove_people":                   removePeople,
+		"can_comment_threads":                 commentThreads,
+		"can_change_user_org_role":            changeUserRole,
+		"can_create_custom_role":              createRole,
+		"can_create_channel":                  createChannels,
+		"can_comment_on_threads":              commentThreads,
+		"can_delete_any_file":                 deleteFiles,
 		"can_remove_people_from_organization": removePeople,
 		"can_manage_general_invite_link":      manageOrg,
 	}
